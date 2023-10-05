@@ -5,23 +5,20 @@
 #include <limits.h>
 #include <stdbool.h>
 
-
-//функция для ввода чисел в заданном диапазоне, кратных указанному
 int multiples(int number, int *result) {
     if (number < 0) {
         number = -number;
     }
-    for (int i = 0; i <= 100; i += number) {
+    for (int i = 0; i < 100; i += number) {
         if (i % number == 0) {
             result[i] += i;
         }
     }
 }
 
-//функция для проверки числа: простое или составное
 bool prime_composite(int number) {
     if (number > 1) {
-        for (int i = 2; i < sqrt(number); i++) 
+        for (int i = 2; i < number; i++) 
             if (number % i == 0) 
                 return false;
         return true;    
@@ -30,15 +27,13 @@ bool prime_composite(int number) {
         return true;
 }
    
-
-//функция для разделения числа на цифры
 int splitNumber(int number, int* arr) {
-    int count;
+    int count = 0;
     int digit;
     if (number < 0) {
         number = -number;
     }
-    if (number >= 0 && number <10) {
+    if (number >= 0 && number < 10) {
         arr[0] = number;
         return 1;
     }
@@ -54,22 +49,23 @@ int splitNumber(int number, int* arr) {
     return count;
 }
 
-//вывод таблицы степеней
-void power_table(int number, int table[][10]) {
-    int i, j;
-    for (i = 1; i <= number; i++) {
-        for (j = 1; j <= 10; j++) {
-            int result = 1;
-            int k;
-            for (k = 0; k < i; k++) {
-                result *= j;
-            }
-            table[i-1][j-1] = result;
+void power_table(int number, int table[][number]) {
+    table[0][0] = 1;
+    for (int i = 1; i < 11; i++) {
+        table[i][0] = 1;
+        table[i][1] = i;
+    }
+    for (int i = 2; i < number; i++) {
+        table[0][i] = 0;
+        table[1][i] = 1;
+    }
+    for (int base = 2; base < 11; base++) {
+        for (int st = 2; st < number; st++) {
+            table[base][st] = table[base][st - 1] * base;
         }
     }
 }
 
-//функция для вычисленя суммы до указонного числа
 int Sum(int number, int *summ) {
     if (number > 0) {
         for (int i = 1; i <= number; i++) {
@@ -85,8 +81,6 @@ int Sum(int number, int *summ) {
     }
 }
 
-
-//факториал числа
 unsigned long long Factorial(unsigned int number, unsigned long long result) {
     for (unsigned int i = 1; i <= number; i++) {
         if (result > ULLONG_MAX / i) {
@@ -97,7 +91,6 @@ unsigned long long Factorial(unsigned int number, unsigned long long result) {
     return result;
 }
 
-//проверка на целое число
 bool integer(const char *str) {
     int string_lenght = strlen(str);
     if (*str == '\0') {
@@ -119,8 +112,10 @@ bool integer(const char *str) {
 }
 
 int main(int argc, char *argv[]) {
+    int num = atoi(argv[1]);
+    int Num = abs(num);
     if (argc != 3) {
-        printf("error");
+        printf("error\n");
     }
     else {
         if (integer(argv[1])) {
@@ -138,8 +133,8 @@ int main(int argc, char *argv[]) {
                             printf("0\n");
                         }
                         for (int i = 0; i < 100; i++) {
-                            if (result[0] != 0) {
-                                printf("%d", result[i]);
+                            if (result[i] != 0) {
+                                printf("%d\n", result[i]);
                             }
                         }
                     }
@@ -149,23 +144,26 @@ int main(int argc, char *argv[]) {
                 }
                 else if (argv[2][1] == 'p') {
                     if (number < INT_MAX) {
-                        if (prime_composite(number)) {
-                            printf("this digit is prime\n");
-                        }
-                        else {
-                            printf("this digit is composite\n");
-                        }
-                    }
-                    else {
-                        printf("overflow\n");
-                    }
+                        if (number < 0) {
+                          number = -number;
+                          if (prime_composite(number)) {
+                              printf("this digit is prime\n");
+                          }
+                          else {
+                              printf("this digit is composite\n");
+                          }
+                      }
+                      else {
+                          printf("overflow\n");
+                      }
+                  }
                 }
                 else if (argv[2][1] == 's') {
                     if (number < INT_MAX) {
                         int arr[100] = {0};
                         int count = splitNumber(number, arr);
                         for (int j = count -1; j >= 0; j--) {
-                            printf("%d", arr[j]);
+                            printf("%d ", arr[j]);
                         }
                     }
                     else {
@@ -173,22 +171,20 @@ int main(int argc, char *argv[]) {
                     }
                 }
                 else if (argv[2][1] == 'e') {
-                    int number;
-                    int table[number][10];
-                    power_table(number, table);
-                    if (number > 0 && number <= 10) {
-                        int i, j;
-                        for (i = 0; i < number; i++) {
-                            for (j = 0; j < 10; j++) {
-                                printf("%d\t", table[i][j]);
-                            }
-                            printf("\n");
+                    int base = 10;
+                    int degree = Num;
+                    int table[base + 1][degree + 1];
+                    power_table(degree + 1, table);
+                    for (int base = 0; base <= 10; base++) {
+                        printf("\n");
+                        for (int j = 0; j <= degree; j++) {
+                            printf("%d^%d = %d", base, j, table[base][j]);
+
                         }
-                        return 0;
                     }
-                    else {
-                        printf("overflow\n");
-                    }
+                    printf("\n");
+                    return 0;
+                        
                 }
                 else if (argv[2][1] == 'a') {
                     if (number != 0) {
@@ -216,7 +212,7 @@ int main(int argc, char *argv[]) {
                         if (number < INT_MAX) {
                             unsigned long long result = 1;
                             long long factorial = Factorial(number, result);
-                            printf("%lli", factorial);
+                            printf("%lli\n", factorial);
                         }
                         else {
                             printf("overflow\n");
