@@ -18,7 +18,7 @@ int multiples(int number, int *result) {
 
 bool prime_composite(int number) {
     if (number > 1) {
-        for (int i = 2; i < number; i++) 
+        for (int i = 2; i < sqrt(number); i++) 
             if (number % i == 0) 
                 return false;
         return true;    
@@ -171,6 +171,10 @@ int main(int argc, char *argv[]) {
                     }
                 }
                 else if (argv[2][1] == 'e') {
+                    if (Num > 10) {
+                        printf("error\n");
+                        return 0;
+                    }
                     int base = 10;
                     int degree = Num;
                     int table[base + 1][degree + 1];
