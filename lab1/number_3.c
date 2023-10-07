@@ -114,91 +114,93 @@ int main(int argc, char *argv[]) {
         printf("invalid flag\n");
         return 0;
     }
-    if (argc < 3) {
-        printf("error\n");
-        return 0;
-    }
-    if (argv[1][1] == 'q') {
-        if (argc != 6) {
-            printf("error\n");
-        }
-        else {
-            if (string(argv[2]) && (string(argv[3])) && (string(argv[4])) && (string(argv[5]))) {
-                int count = 0;
-                double new_arr[100][3] = {0.0};
-                double arr[3];
-                double n1 = atof(argv[3]);
-                double n2 = atof(argv[4]);
-                double n3 = atof(argv[5]);
-                double epsilon = atof(argv[2]);
-                arr[0] = n1;
-                arr[1] = n2;
-                arr[3] = n3;
-
-                permution(new_arr, arr, 3, &count);
-                for (int i = 0; i < count; i++) {
-                    double discriminant = pow(new_arr[i][1], 2) - 4 * new_arr[i][0] * new_arr[i][2];
-                    if (discriminant > epsilon) {
-                        double x1 = (-new_arr[i][1] + sqrt(discriminant)) / (2 * new_arr[i][0]);
-                        double x2 = (-new_arr[i][1] - sqrt(discriminant)) / (2 * new_arr[i][0]);
-                        printf("%lf %lf %lf\n", new_arr[i][0], new_arr[i][1], new_arr[i][2]);
-                        printf("%lf %lf\n", x1, x2);
-                        printf("\n");
-                    }
-                    else if (fabs(discriminant) < epsilon) {
-                        double x = - new_arr[i][1] / (2 * new_arr[i][0]);
-                        printf("%lf %lf % lf\n", new_arr[i][0], new_arr[i][1], new_arr[i][2]);
-                        printf("%lf\n", x);
-                        printf("\n");
-                    }
-                    else {
-                        printf("%lf %lf % lf\n", new_arr[i][0], new_arr[i][1], new_arr[i][2]);
-                        printf("error\n");
-                        printf("\n");
-
-                    }
-                }
-
-            }
-            else {
+    else {
+        if (argv[1][1] == 'q') {
+            if (argc != 6) {
                 printf("error\n");
             }
-        }
-    }
+            else {
+                if ((string(argv[2])) && (string(argv[3])) && (string(argv[4])) && (string(argv[5]))) {
+                    int count = 0;
+                    double new_arr[100][3] = {0.0};
+                    double arr[3];
+                    double n1 = atof(argv[3]);
+                    double n2 = atof(argv[4]);
+                    double n3 = atof(argv[5]);
+                    double epsilon = atof(argv[2]);
+                    arr[0] = n1;
+                    arr[1] = n2;
+                    arr[3] = n3;
 
-    else if (argv[1][1] == 'm') {
-        if (argc != 4) {
-            printf("error\n");
-            return 0;
-        }
-        else {
-            if (integer(argv[2]) && integer(argv[3])) {
-                if (multiple(atoi(argv[2]), atoi(argv[3]))) {
-                    printf("yes\n");
+                    permution(new_arr, arr, 3, &count);
+                    for (int i = 0; i < count; i++) {
+                        double discriminant = pow(new_arr[i][1], 2) - 4 * new_arr[i][0] * new_arr[i][2];
+                        if (discriminant > epsilon) {
+                            double x1 = (-new_arr[i][1] + sqrt(discriminant)) / (2 * new_arr[i][0]);
+                            double x2 = (-new_arr[i][1] - sqrt(discriminant)) / (2 * new_arr[i][0]);
+                            printf("%lf %lf %lf\n", new_arr[i][0], new_arr[i][1], new_arr[i][2]);
+                            printf("%lf %lf\n", x1, x2);
+                            printf("\n");
+                        }
+                        else if (fabs(discriminant) < epsilon) {
+                            double x = - new_arr[i][1] / (2 * new_arr[i][0]);
+                            printf("%lf %lf % lf\n", new_arr[i][0], new_arr[i][1], new_arr[i][2]);
+                            printf("%lf\n", x);
+                            printf("\n");
+                        }
+                        else {
+                            printf("%lf %lf % lf\n", new_arr[i][0], new_arr[i][1], new_arr[i][2]);
+                            printf("error\n");
+                            printf("\n");
+                        }
+                    }
                 }
                 else {
-                    printf("no\n");
+                    printf("error\n");
                 }
             }
         }
-    }
-    else if (argv[1][1] == 't') {
-        if (argc != 6) {
-            printf("error\n");
-            return 0;
-        }
-        else {
-            if ((string(argv[2])) && (string(argv[3])) && string(argv[4]) && string(argv[5])) {
-                if (triangle(atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5]))) {
-                    printf("it is triangle\n");
+
+        else if (argv[1][1] == 'm') {
+            if (argc != 4) {
+                printf("error\n");
+                return 0;
+            }
+            else {
+                if (integer(argv[2]) && integer(argv[3])) {
+                    if (multiple(atoi(argv[2]), atoi(argv[3]))) {
+                        printf("yes\n");
+                    }
+                    else {
+                        printf("no\n");
+                    }
                 }
                 else {
-                    printf("it is not triangle\n");
+                    printf("error\n");
                 }
             }
         }
-    }
-    else {
-        printf("invalid flag\n");
+        else if (argv[1][1] == 't') {
+            if (argc != 6) {
+                printf("error\n");
+                return 0;
+            }
+            else {
+                if ((string(argv[2])) && (string(argv[3])) && string(argv[4]) && string(argv[5])) {
+                    if (triangle(atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5]))) {
+                        printf("it is triangle\n");
+                    }
+                    else {
+                        printf("it is not triangle\n");
+                    }
+                }
+                else {
+                    printf("error\n");
+                }
+            }
+        }
+        else {
+            printf("invalid flag\n");
+        }
     }
 }
