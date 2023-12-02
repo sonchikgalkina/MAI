@@ -73,11 +73,33 @@ int multiple(int a, int b) {
     }
 }
 
-bool triangle(double num1, double num2, double num3, double epsilon) {
-    if (num1 <= 0 || num2 <= 0 || num3 <= 0) {
-        return false;
+double max(double a, double b, double c) {
+    double max = a;
+    if (b > max) {
+        max = b;
     }
-    if (fabs((num1 * num1) + (num2 * num2) - (num3 * num3)) <= epsilon || fabs((num1 * num1) + (num3 * num3) - (num2 * num2)) <= epsilon || fabs((num2 * num2) + (num3 * num3) - (num1 * num1)) <= epsilon) {
+    if (c > max) {
+        max = c;
+    }
+    return max;
+}
+
+double min(double a, double b, double c) {
+    double min = a;
+    if (b < min) {
+        min = b;
+    }
+    if (c < min) {
+        min = c;
+    }
+    return min;
+}
+
+bool triangle(double num1, double num2, double num3, double epsilon) {
+    double max_el = max(num1, num2, num3);
+    double min_el = min(num1, num2, num3);
+    double middle_el = (num1 + num2 + num3) - max_el - min_el;
+    if (fabs(min_el * min_el + middle_el * middle_el - max_el * max_el) < epsilon) {
         return true;
     }
     else {
@@ -85,59 +107,34 @@ bool triangle(double num1, double num2, double num3, double epsilon) {
     }
 }
 
-void permutation(double* array, int count, double eps, double* roots) {
-    double a, b, c;
-    int root_index = 0;
-    for (int i = 0; i < count; i += 3)
-    {
-        a = array[i];
-        b = array[i+1];
-        c = array[i+2];
-        double D = b*b - 4*a*c;
-        if (D > eps)
-        {
-            double x1 = (-b + sqrt(D)) / (2*a);
-            double x2 = (-b - sqrt(D)) / (2*a);
-            roots[root_index++] = x1;
-            roots[root_index++] = x2;
-        }
-        else if (fabs(D) < eps)
-        {
-            double x = -b / (2*a);
-            roots[root_index] = x;
-            root_index++;
-        } else
-        {
-            printf("No real roots\n");
-        }
-    }
-}
-
-
-void swap(double *a, double *b) {
-    double temp = *a;
-    *a = *b;
-    *b = temp;
-}
-
-int koeficients_permutation(double lst[], int n, double* array) {
-    int count = 0;
-    if (n < 2) {
+void permutation(double new_array[][3], double array[], int n, int *count) {
+    if (n == 1) {
         for (int i = 0; i < 3; i++) {
-            array[count] = lst[i];
-            count++;
+            new_array[*count][i] = array[i];
         }
-        return count;
+        (*count)++;
+        return;
     }
-    for (int i = 0; i < n; i++) {
-        swap(&lst[i], &lst[n-1]);
-        count += koeficients_permutation(lst, n-1, array + count);
-        swap(&lst[i], &lst[n-1]);
+    for(int i = 0; i < n; i++) {
+        permutation(new_array, array, n - 1, count);
+        if (n % 2 == 0) {
+            double temp = array[i];
+            array[i] = array[n - 1];
+            array[n - 1] = temp;
+        }
+        else {
+            double temp = array[i];
+            array[i] = array[n - 1];
+            array[n - 1] = temp;
+        }
     }
-    return count;
 }
 
 int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        printf("error\n");
+        return 0;
+    }
     if (strlen(argv[1]) != 2 || argv[1][0] != '-' && argv[1][0] != '/') {
         printf("invalid flag\n");
         return 0;
@@ -149,21 +146,27 @@ int main(int argc, char *argv[]) {
             }
             else {
                 if ((string(argv[2])) && (string(argv[3])) && (string(argv[4])) && (string(argv[5]))) {
-                    double eps = atof(argv[2]);
-                    int n = 3;
-                    double lst[n];
-                    for (int i = 0; i < n; i ++) {
-                        lst[i] = atof(argv[i+3]);
+                    int count = 0;
+                    double new_array[100][3] = {0.0};
+                    double array[3];
+                    double epsilon = atof(argv[2]);
+                    double num1 = atof(argv[3]);
+                    double num2 = atof(argv[4]);
+                    double num3 = atof(argv[5]);
+                    array[0] = num1;
+                    array[1] = num2;
+                    array[2] = num3;
+                    permutation(new_array, array, 3, &count);
+                    for (int i = 0; i < count; i++) {
+                        double discr = pow(new_array[2][1], 2) - 4 * new_array[i][0] * new_array[i][2];
+                        if (discr > epsilon) {
+                            double x1 = (-new_array[i][1] + sqrt(discr)) / (2 * new_array[i][0]);
+                            double x2 = (-new_array[i][1]) - sqrt(discr) / (2 * new_array[i][0]);
+                            printf("permutation %lf %lf %lf:\n", new_array[i][0], new_array[i][1], new_array[i][2]);
+                            printf("the solution is a complex number\n");
+                            printf("\n");
+                        }
                     }
-                    double roots[12] = {0};
-                    double array[18] = {0};
-                    int count = koeficients_permutation(lst, n, array);
-                    permutation(array, count, eps, roots);
-                    for(int j = 0; j < 12; j++) {
-                        printf("%.1f ", roots[j]);
-                        printf("\n");
-                    }
-                    printf("\n");
                 }
                 else {
                     printf("error\n");
