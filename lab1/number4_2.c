@@ -1,103 +1,106 @@
 #include <stdio.h>
 #include <stdarg.h>
-#include <errno.h>
-#include <math.h>
-#include <stdbool.h>
+#include <stdlib.h>
 
-enum status_codes {
-    overflowed,
-    invalid, 
-    error_memory,
-    error_open_file,
-    ok
+
+enum error {
+    ok,
+    invalid_value,
+    error_memory
 };
 
-void print_error(int status) {
-    switch (status)
+typedef struct {
+    double x, y;
+
+} point;
+
+void print_errors(int flag) {
+    switch (flag)
     {
-    case overflowed:
-        printf("overflowed\n");
+    case invalid_value:
+        printf("invalid value\n");
         break;
+
     case error_memory:
-        printf("memory issues\n");
+        printf("error with memory allocation\n");
         break;
-    case error_open_file:
-        printf("unable to open a file\n");
-        break;
+
     default:
         break;
     }
 }
 
-typedef struct {
-    double x, y;
-} vec2d;
-
-double cross(const vec2d a, const vec2d b) {
-    return a.x * b.y - b.x * a.y;
-}
-
-int is_convex(int n, ...) {
-    if (n < 3) return false;
-    va_list param;
-    va_start(param, n);
-    vec2d a, b;
-    double x1, x2, y1, y2, x3, y3;
-    x1 = va_arg(param, double);
-    y1 = va_arg(param, double);
-    x2 = va_arg(param, double);
-    y2 = va_arg(param, double);
-    x3 = va_arg(param, double);
-    y3 = va_arg(param, double);
-    a.x = x2-x1;
-    a.y = y2-y1;
-    b.x = x3-x2;
-    b.y = y3-y2;
-    double cr = cross(a, b);
-    for (int i = 2; i < n; i++) {
-        x2 = x3;
-        y2 = y3;
-        x3 = va_arg(param, double);
-        y3 = va_arg(param, double);
-        a.x = b.x;
-        a.y = b.y;
-        b.x = x3-x2;
-        b.y = y3-y2;
-        double cr2 = cross(a, b);
-        if (cr * cr2 <= 0) {
-            va_end(param);
-            return false;
+enum error value_of_polynomial(double* result, double a, int degree, ...) {
+    va_list args;
+    va_start(args, degree);
+    if (degree >= 0) {
+        for (int i = 0; i <= degree; i++) {
+            *result = *result * a + va_arg(args, double);
         }
     }
-    va_end(param);
-    return true;
+    else {
+        if (a == 0) {
+            return invalid_value;
+        }
+        for (int i = 0; i >= degree; i--) {
+            *result = *result / a + va_arg(args, double);
+        }
+    }
+    va_end(args);
+    return ok;
 }
 
-int polynomial_value(double* ans, double x, int n, ...) {
-    if (n < 0) {
-        return invalid;
+enum error is_convex(int n, ...) {
+    if (n < 3) {
+        return invalid_value;
     }
-    va_list param;
-    va_start(param, n);
-    *ans = va_arg(param, double);
-    for (int i = 0; i < n; i++) {
-        *ans *= x;
-        *ans += va_arg(param, double);
+    va_list args;
+    va_start(args, n);
+    point* points = va_arg(args, point*);
+    va_end(args);
+    int NEG = 0;
+    for (int a = 0; a < n; a++) {
+        int b = (a + 1) % n;
+        int c = (a + 2) % n;
+        double xA = points[a].x;
+        double yA = points[a].y;
+        double xB = points[b].x;
+        double yB = points[b].y;
+        double xC = points[c].x;
+        double yC = points[c].y;
+        double POS = (xB - xA) * (yC - yB) - (yB - yA) * (xC - xB);
+        if (POS > 0) {
+            POS++;
+        }
+        else if (POS < 0) {
+            NEG++;
+        }
+        if (POS > 0 && NEG > 0) {
+            return invalid_value;
+        }
     }
-    va_end(param);
     return ok;
 }
 
 int main() {
-    printf("%d\n", is_convex(4, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0));
-    double ans;
-    int status = polynomial_value(&ans, -600.0, 2, 1.0, 2.0, 1.0);
-    if (status != ok) {
-        print_error(status);
-        return 1;
+    double result = 0;
+    double a = 1.0;
+    int degree = 3;
+    enum error result_pol = value_of_polynomial(&result, a, degree, 4.0, 5.0, 1.0, 6.0);
+    if (result_pol != ok) {
+        print_errors(result_pol);
     }
-    else {
-        printf("%lf\n", ans);
+    if (result_pol == ok) {
+        printf("the result of polynom is %f\n", result);
+    }
+    int n = 3;
+    point point[3] = {{1, 2}, {4, 2}, {7, 2}};
+    enum error polygon_res = is_convex(n, point[0], point[1], point[2]);
+    if (polygon_res == invalid_value) {
+        printf("this polygon is not convex\n");
+    }
+    else if (polygon_res == ok) {
+        printf("this polygon is convex\n");
     }
     return 0;
 }
